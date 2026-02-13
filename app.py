@@ -15,17 +15,22 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URI", 'postgresql://
 
 db.init_app(app)
 
-### вызов сей таблицы с возможностью сортировки
+### вызов всей таблицы с возможностью сортировки
 @app.route("/")
-def all_employees():
+def employees_list():
     #основной запрос
     query = Employee.query
+
+    #поиск
+    search_term = request.args.get('search', '').strip()
+    if search_term:
+        query = query.filter(Employee.full_name.ilike(f'%{search_term}%'))
 
     sort_field = request.args.get('sort','full_name')
     sort_order = request.args.get('order', 'asc')
 
     #поля сортировки
-    valid_fields = ['id', 'full_name', 'position', 'date_employment', 'salary']
+    valid_fields = ['id', 'full_name', 'position', 'date_employment', 'salary', 'manager']
 
     if sort_field not in valid_fields:
         sort_field = 'full_name'
@@ -39,7 +44,9 @@ def all_employees():
         order_col = order_col.asc()
 
     query = query.order_by(order_col)
-    #employees = query.all()
+    employees = query.all()
+
+
 
     return render_template(
         'employees.html', employees=query,
