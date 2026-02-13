@@ -14,6 +14,14 @@ class Employee(db.Model):
     salary = db.Column(db.Integer)
     parent_id = db.Column(db.Integer, db.ForeignKey('state_company.id'), nullable=True)
 
+    # связка
+    manager = db.relationship(
+        'Employee', remote_side=[id],
+        back_populates='subordinates', uselist=False)
+
+    subordinates = db.relationship(
+        'Employee', back_populates='manager')
+
 
     def __repr__(self):
         return f'<Employee {self.full_name} [{self.position}]>'
