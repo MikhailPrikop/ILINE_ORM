@@ -39,10 +39,10 @@ def all_employees():
         order_col = order_col.asc()
 
     query = query.order_by(order_col)
-    employees = query.all()
+    #employees = query.all()
 
     return render_template(
-        'employees.html', employees=employees,
+        'employees.html', employees=query,
         sort_field=sort_field, sort_order=sort_order)
 
 if __name__ == '__main__':

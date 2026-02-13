@@ -2,42 +2,149 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Список сотрудников</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сотрудники — ILINE_ORM</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .table th a {
+            text-decoration: none;
+            color: inherit;
+            display: inline-block;
+            padding-right: 4px;
+        }
+        .table th a:hover {
+            text-decoration: underline;
+            color: #fff;
+        }
+        .sort-indicator {
+            font-size: 0.8em;
+            margin-left: 3px;
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-5">
-        <h1 class="mb-4">Сотрудники</h1>
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>ФИО</th>
-                    <th>Должность</th>
-                    <th>Дата приёма</th>
-                    <th>Зарплата</th>
-                    <th>Начальник</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for emp in employees %}
-                <tr>
-                    <td>{{ emp.id }}</td>
-                    <td>{{ emp.full_name }}</td>
-                    <td>{{ emp.position or '—' }}</td>
-                    <td>{{ emp.date_employment.strftime('%d.%m.%Y') }}</td>
-                    <td>{{ "{:,.2f}".format(emp.salary) if emp.salary else '—' }}</td>
-                    <td>
-                        {% if emp.manager %}
-                            {{ emp.manager.full_name }}
-                        {% else %}
-                            <span class="text-muted">Нет</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <h1 class="mb-4">📋 Список сотрудников</h1>
+
+        <!-- Таблица сотрудников -->
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <!-- ID -->
+                        <th>
+                            <a href="{{ url_for('all_employees',
+                                sort='id',
+                                order='desc' if sort_field == 'id' and sort_order == 'asc' else 'asc') }}">
+                                ID
+                                {% if sort_field == 'id' %}
+                                    <span class="sort-indicator">
+                                        {{ '▼' if sort_order == 'desc' else '▲' }}
+                                    </span>
+                                {% endif %}
+                            </a>
+                        </th>
+                        <!-- ФИО -->
+                        <th>
+                            <a href="{{ url_for('all_employees',
+                                sort='full_name',
+                                order='desc' if sort_field == 'full_name' and sort_order == 'asc' else 'asc') }}">
+                                ФИО
+                                {% if sort_field == 'full_name' %}
+                                    <span class="sort-indicator">
+                                        {{ '▼' if sort_order == 'desc' else '▲' }}
+                                    </span>
+                                {% endif %}
+                            </a>
+                        </th>
+                        <!-- Должность -->
+                        <th>
+                            <a href="{{ url_for('all_employees',
+                                sort='position',
+                                order='desc' if sort_field == 'position' and sort_order == 'asc' else 'asc') }}">
+                                Должность
+                                {% if sort_field == 'position' %}
+                                    <span class="sort-indicator">
+                                        {{ '▼' if sort_order == 'desc' else '▲' }}
+                                    </span>
+                                {% endif %}
+                            </a>
+                        </th>
+                        <!-- Дата приёма -->
+                        <th>
+                            <a href="{{ url_for('all_employees',
+                                sort='date_employment',
+                                order='desc' if sort_field == 'date_employment' and sort_order == 'asc' else 'asc') }}">
+                                Дата приёма
+                                {% if sort_field == 'date_employment' %}
+                                    <span class="sort-indicator">
+                                        {{ '▼' if sort_order == 'desc' else '▲' }}
+                                    </span>
+                                {% endif %}
+                            </a>
+                        </th>
+                        <!-- Зарплата -->
+                        <th>
+                            <a href="{{ url_for('all_employees',
+                                sort='salary',
+                                order='desc' if sort_field == 'salary' and sort_order == 'asc' else 'asc') }}">
+                                Зарплата
+                                {% if sort_field == 'salary' %}
+                                    <span class="sort-indicator">
+                                        {{ '▼' if sort_order == 'desc' else '▲' }}
+                                    </span>
+                                {% endif %}
+                            </a>
+                        </th>
+                        <!-- Начальник -->
+                        <th>Начальник</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for emp in employees %}
+                    <tr>
+                        <td>{{ emp.id }}</td>
+                        <td>{{ emp.full_name }}</td>
+                        <td>{{ emp.position or '—' }}</td>
+                        <td>
+                            {% if emp.date_employment %}
+                                {{ emp.date_employment.strftime('%d.%m.%Y') }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if emp.salary %}
+                                {{ "{:,.2f}".format(emp.salary).replace(',', ' ') }} ₽
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if emp.manager %}
+                                {{ emp.manager.full_name }}
+                            {% else %}
+                                <span class="text-muted">Нет</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4">
+                            <em>Сотрудники не найдены</em>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Подсказка по сортировке -->
+        <div class="text-muted mt-2 small">
+            Кликните на заголовок столбца для сортировки. Повторный клик изменит направление.
+        </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
