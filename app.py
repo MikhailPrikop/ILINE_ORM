@@ -4,6 +4,7 @@ import os
 from flask import Flask
 from flask import render_template
 from flask import request
+from flask import redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from database import db, Employee
 
@@ -20,6 +21,7 @@ db.init_app(app)
 def employees_list():
     #основной запрос
     query = Employee.query
+
 
     #поиск
     search_term = request.args.get('search', '').strip()
@@ -51,6 +53,30 @@ def employees_list():
     return render_template(
         'employees.html', employees=query,
         sort_field=sort_field, sort_order=sort_order)
+
+### Изменение начальника
+@app.route("/employee/<int:id>/edit_manager", methods=['GET', 'POST'])
+def edit_manager(id):
+    employee = Employee.query.get_or_404(id)
+
+    if request.method == 'POST':
+        new_manager_id = request.form.get('manager_id')
+        if new_manager_id:
+            # проверка существования сотрудника
+            manager = Employee.query.get(new_manager_id)
+            if manager is None:
+                return "Начальник не найден", 400
+            if int(new_manager_id) == employee.id:
+                return "Нельзя назначить начальником самого себя", 400
+            employee.parent_id = new_manager_id
+        else:
+            employee.parent_id = None
+
+        db.session.commit()
+        return redirect(url_for('employees_list'))
+
+    employees = Employee.query.filter(Employee.id != id).all()
+    return render_template('edit_manager.html', employee=employee, employees=employees)
 
 if __name__ == '__main__':
     app.run(debug=True)

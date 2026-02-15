@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Изменить начальника</title>
+</head>
+<body>
+    <h1>Изменение начальника для {{ employee.full_name }}</h1>
+    <form method="post">
+        <label for="manager_id">Выберите начальника:</label>
+        <select name="manager_id" id="manager_id">
+            <option value="">-- Без начальника --</option>
+            {% for emp in employees %}
+                <option value="{{ emp.id }}" {% if emp.id == employee.parent_id %}selected{% endif %}>
+                    {{ emp.full_name }} ({{ emp.position }})
+                </option>
+            {% endfor %}
+        </select>
+        <br><br>
+        <button type="submit">Сохранить</button>
+        <a href="{{ url_for('employees_list') }}">Отмена</a>
+    </form>
+</body>
+</html>

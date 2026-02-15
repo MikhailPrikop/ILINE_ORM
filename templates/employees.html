@@ -92,14 +92,9 @@
                             </a>
                         </th>
                         <!-- Начальник -->
-                        <th>
-                            <a href="{{ url_for('employees_list', sort='manager', order='desc' if sort_field == 'manager' and sort_order == 'asc' else 'asc', search=search_term) }}">
-                                Начальник
-                                {% if sort_field == 'manager' %}
-                                    <span class="sort-indicator">{{ '▼' if sort_order == 'desc' else '▲' }}</span>
-                                {% endif %}
-                            </a>
-                        </th>
+                        <th>Начальник</th>
+                        <!-- Действия -->
+                        <th>Действия</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -129,10 +124,15 @@
                                 <span class="text-muted">Нет</span>
                             {% endif %}
                         </td>
+                        <td>
+                            <a href="{{ url_for('edit_manager', id=emp.id) }}" class="btn btn-sm btn-outline-primary">
+                                ✎ Изменить начальника
+                            </a>
+                        </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="6" class="text-center py-4">
+                        <td colspan="7" class="text-center py-4">
                             <em>Сотрудники не найдены</em>
                         </td>
                     </tr>
