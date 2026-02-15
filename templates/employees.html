@@ -92,7 +92,14 @@
                             </a>
                         </th>
                         <!-- Начальник -->
-                        <th>Начальник</th>
+                        <th>
+                            <a href="{{ url_for('employees_list', sort='manager', order='desc' if sort_field == 'salary' and sort_order == 'asc' else 'asc', search=search_term) }}">
+                                Начальник
+                                {% if sort_field == 'manager' %}
+                                    <span class="sort-indicator">{{ '▼' if sort_order == 'desc' else '▲' }}</span>
+                                {% endif %}
+                            </a>
+                        </th>
                         <!-- Действия -->
                         <th>Действия</th>
                     </tr>
